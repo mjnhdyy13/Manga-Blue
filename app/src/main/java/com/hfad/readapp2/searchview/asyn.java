@@ -1,6 +1,7 @@
 package com.hfad.readapp2.searchview;
 
 import android.os.AsyncTask;
+import android.os.SystemClock;
 import android.util.Log;
 
 import com.hfad.readapp2.Manga;
@@ -31,24 +32,16 @@ public class asyn extends AsyncTask<String, Void, ArrayList<Manga>> {
 
     private List<Suggestion> suggestions = new ArrayList<>();
 
-    // Xây dựng okhttp
-    /*OkHttpClient okHttpClient = new OkHttpClient.Builder()
-            .connectTimeout(20, TimeUnit.SECONDS)
-            .writeTimeout(20, TimeUnit.SECONDS)
-            .readTimeout(20, TimeUnit.SECONDS)
-            .retryOnConnectionFailure(true)
-            .build();*/
-
     @Override
     protected void onPostExecute(ArrayList<Manga> articles) {
         super.onPostExecute(articles);
 
-        //Log.d("hi hallo",s);
+
 
         //arr_main chính là từ khoá bạn muốn được suggest
         // arr_sub chính là kết quả suggest được trả về từ google
 
-        for (int i = 0; i < 8; i++) {
+        for (int i = 0; i < articles.size(); i++) {
             Manga manga1 = articles.get(i);
             suggestions.add(new Suggestion(manga1.getTentruyen(),manga1.getLinktruyen(),manga1.getLinkanh())) ;
         }
@@ -61,6 +54,8 @@ public class asyn extends AsyncTask<String, Void, ArrayList<Manga>> {
     protected ArrayList<Manga> doInBackground(String... strings) {
         Document document = null;
 
+
+
         try {
             /*Log.d("hi bye",strings[0]);
             //Thời gian chờ xem thừ người dùng có nhập thêm kí tự nữa hay không.
@@ -72,6 +67,7 @@ public class asyn extends AsyncTask<String, Void, ArrayList<Manga>> {
             Response response = okHttpClient.newCall(request).execute();
             return response.body().string();*/
             //Thread.sleep(250);
+            SystemClock.sleep(2000);
             document = (Document) Jsoup.connect(strings[0]).get();
             if (document != null) {
                 Elements sub = document.select("div.thumb-item-flow");

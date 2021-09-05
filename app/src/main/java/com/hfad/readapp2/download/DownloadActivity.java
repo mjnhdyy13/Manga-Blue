@@ -6,15 +6,20 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.Manifest;
+import android.app.NotificationChannel;
+import android.app.NotificationManager;
 import android.content.Context;
 import android.content.pm.PackageManager;
 import android.os.AsyncTask;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.text.method.CharacterPickerDialog;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+import android.widget.ImageView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
@@ -41,15 +46,15 @@ import java.util.List;
 
 public class DownloadActivity extends AppCompatActivity  {
 
-    Manga manga;
-    String url_chap;
-    Button button;
+    Button button,btsuccess;
     ArrayList<Chap> arraychapT;
-
+    Truyen truyen;
     RecyclerView recyclerView1;
+
+    ImageView imageView,backbutton;
+    TextView textView;
     ShowDownloadAdapter showDownloadAdapter;
 
-    ArrayList<String> listtruyen;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -57,31 +62,34 @@ public class DownloadActivity extends AppCompatActivity  {
         if (!verifyPermissions()) {
             return;
         }
+        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.O){
+            NotificationChannel channel = new NotificationChannel("noty","noty", NotificationManager.IMPORTANCE_HIGH);
+            NotificationManager manager = getSystemService(NotificationManager.class);
+            manager.createNotificationChannel(channel);
+        }
         init();
         anhXa();
         configRecyclerView();
         setUP();
-
-        new LoadDownTask().execute(url_chap);
         button.setOnClickListener(new View.OnClickListener() {
-
             @Override
             public void onClick(View v) {
-                //new AsynDownload(DownloadActivity.this).execute(arraychapT);
-                addTruyen();
-
-
+                new AsynDownload(DownloadActivity.this,imageView,textView,btsuccess).execute(truyen);
+                addTruyen(truyen);
+            }
+        });
+        btsuccess.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                imageView.setVisibility(View.GONE);
+                textView.setVisibility(View.GONE);
+                btsuccess.setVisibility(View.GONE);
             }
         });
     }
 
-    private void addTruyen() {
+    private void addTruyen( Truyen truyen) {
 
-        if(arraychapT == null) {
-            Log.d("loi","zzzzzzzzzzz");
-            return;
-        }
-        Truyen truyen = new Truyen(manga.getTentruyen(), manga.getLinkanh(), arraychapT);
         TruyenDatabase.getInstance(this).truyenDAO().insertTruyen(truyen);
         Toast.makeText(this,"Add successes",Toast.LENGTH_SHORT).show();
     }
@@ -101,110 +109,36 @@ public class DownloadActivity extends AppCompatActivity  {
 
     private void init(){
         Bundle b = getIntent().getBundleExtra("data2");
-        manga = (Manga) b.getSerializable("truyen2");
-        url_chap = manga.getLinktruyen();
+        truyen = (Truyen) b.getSerializable("truyen2");
 
 
-        arraychapT = new ArrayList<>();
+        arraychapT = truyen.getArraychap();
         showDownloadAdapter = new ShowDownloadAdapter(arraychapT,this);
     }
     private void configRecyclerView() {
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(this);
-//        recyclerView1.setHasFixedSize(true);
-//        recyclerView1.setItemViewCacheSize(20);
-//
-//        recyclerView1.setDrawingCacheEnabled(true);
-//        recyclerView1.setDrawingCacheQuality(View.DRAWING_CACHE_QUALITY_HIGH);
         recyclerView1.setLayoutManager(linearLayoutManager);
     }
 
     private void anhXa(){
+        backbutton = findViewById(R.id.homedownload);
+        imageView = findViewById(R.id.img_download);
+        textView = findViewById(R.id.text_DL);
         button = findViewById(R.id.startDownload);
+        btsuccess = findViewById(R.id.bt_success);
         recyclerView1= findViewById(R.id.recdown);
 
     }
     private void setUP(){
+        backbutton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                finish();
+                Log.d("back ","chap");
+            }
+        });
         recyclerView1.setAdapter(showDownloadAdapter);
 
     }
-
-    private class LoadDownTask extends AsyncTask<String, Void, ArrayList<Chap>> {
-
-        private static final String TAG = "DownloadTask1";
-
-        @Override
-        protected ArrayList<Chap> doInBackground(String... strings) {
-            Document document = null;
-
-            try {
-                document = (Document) Jsoup.connect(strings[0]).get();
-                if (document != null) {
-                    Elements sub = document.getElementsByClass("list-chapters at-series");
-                    Elements links = sub.select("a[href]");
-                    for (Element element : links) {
-                        Chap chapter = new Chap();
-                        Element linkchap = element.select("a[href]").first();
-                        Element tenchap = element.select("a[href]").first();
-                        Element date = element.getElementsByClass("chapter-time").first();
-                        //Parse to model
-
-                        if (linkchap != null) {
-                             String title = linkchap.attr("href");
-                             listtruyen = getlinkanh(title);
-                             chapter.setListimage(listtruyen);
-                             //Log.d("zzzz",chapter.getListimage().get(2) +" "+ title);
-                             chapter.setLinkchap(title);
-
-                            //Log.d("hi",title);
-                        }
-                        if (tenchap != null) {
-                            String ten = tenchap.attr("title");
-                            chapter.setTenChap(ten);
-                            //Log.d("hi",ten);
-                        }
-                        if (date != null) {
-                            String day = date.text();
-                            chapter.setNgayDang(day);
-                            //Log.d("hi",day);
-                        }
-                        arraychapT.add(chapter);
-                        //Log.d("xxx","hi");
-                    }
-
-                }
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-            return arraychapT;
-        }
-        @Override
-        protected void onPostExecute(ArrayList<Chap> articles) {
-            super.onPostExecute(articles);
-            recyclerView1.setAdapter(showDownloadAdapter);
-        }
-
-    }
-    public ArrayList<String> getlinkanh(String s){
-        ArrayList<String> arr = new ArrayList<>();
-        Document document = null;
-        try {
-            document = Jsoup.connect(s).get();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        if (document != null) {
-            Elements links = document.select("img");
-            for (Element element : links) {
-                Element linkchap = element.select("img[data-src]").first();
-                //Parse to model
-                if (linkchap != null) {
-                    String title = linkchap.attr("data-src");
-                    arr.add(title);
-                }
-            }
-        }
-        return arr;
-    }
-
 
 }

@@ -5,9 +5,9 @@
     android:layout_height="wrap_content">
     <ImageView
         android:id="@+id/img_truyen"
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:src="@drawable/manga"
         android:adjustViewBounds="true"
-        android:layout_height="wrap_content"/>
+        android:layout_height="match_parent"/>
 
 </LinearLayout>

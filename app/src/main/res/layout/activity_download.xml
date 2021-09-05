@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
@@ -11,7 +11,15 @@
         android:layout_weight="2"
         android:layout_width="match_parent"
         android:layout_height="match_parent">
+        <ImageView
+            android:layout_marginTop="10dp"
+            android:layout_marginLeft="5dp"
+            android:id="@+id/homedownload"
+            android:src="@drawable/left12"
+            android:layout_width="30dp"
+            android:layout_height="30dp"/>
         <TextView
+            android:layout_marginTop="10dp"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:gravity="center"
@@ -21,15 +29,46 @@
             android:textStyle="bold" />
 
         <androidx.recyclerview.widget.RecyclerView
+            android:layout_marginTop="20dp"
             android:id="@+id/recdown"
             android:paddingTop="35dp"
             android:layout_width="match_parent"
             android:layout_height="match_parent" />
     </RelativeLayout>
 
+    <LinearLayout
+        android:layout_gravity="center"
+        android:layout_width="wrap_content"
+        android:orientation="vertical"
+
+        android:layout_height="wrap_content">
+        <TextView
+            android:layout_gravity="center"
+            android:id="@+id/text_DL"
+            android:visibility="invisible"
+            android:layout_width="wrap_content"
+            android:text="Downloading file. Please wait..."
+            android:layout_height="wrap_content"/>
+        <ImageView
+            android:visibility="invisible"
+            android:id="@+id/img_download"
+            android:layout_width="185dp"
+            android:layout_height="185dp"/>
+
+        <Button
+            android:id="@+id/bt_success"
+            android:layout_width="wrap_content"
+            android:layout_height="38dp"
+            android:layout_gravity="center"
+            android:background="@drawable/bg_edit"
+            android:text="Ok"
+            android:visibility="invisible"
+            app:backgroundTint="#00B8D4" />
+    </LinearLayout>
 
     <Button
 
+        android:layout_gravity="bottom"
         android:text="Start Download"
         android:id="@+id/startDownload"
         android:layout_width="match_parent"
@@ -39,4 +78,4 @@
         android:layout_marginStart="-2dp"
         android:layout_marginBottom="5dp" />
 
-</LinearLayout>
+</FrameLayout>

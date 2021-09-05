@@ -42,6 +42,7 @@ public class ShowDownloadAdapter extends RecyclerView.Adapter<ShowDownloadAdapte
         Chap chap = arraychap.get(position);
         String tenchap = chap.getTenChap();
         holder.txvchap.setText(tenchap);
+//        holder.txvchap.setCompoundDrawablesWithIntrinsicBounds(R.drawable.baseline_label_important_black_24dp, 0, 0, 0);
 
     }
 

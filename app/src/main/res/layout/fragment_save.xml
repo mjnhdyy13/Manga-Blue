@@ -1,14 +1,40 @@
 <?xml version="1.0" encoding="utf-8"?>
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:id="@+id/deltaRelative"
     tools:context=".save.SaveFragment">
 
-    <!-- TODO: Update blank fragment layout -->
-    <TextView
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:text="@string/hello_blank_fragment" />
 
-</FrameLayout>
+    <TextView
+        android:id="@+id/textView3"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentEnd="true"
+        android:layout_marginTop="16dp"
+        android:layout_marginEnd="178dp"
+        android:textSize="20sp"
+        android:text="Tủ sách"
+        android:textColor="#120F0F"
+        android:textColorHint="#FFFFFF"
+        android:textStyle="bold" />
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:layout_marginTop="60dp"
+        android:id="@+id/rcysave"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />
+
+    <ImageView
+        android:id="@+id/homesave"
+        android:layout_width="39dp"
+        android:layout_height="40dp"
+        android:layout_alignParentTop="true"
+        android:layout_marginTop="7dp"
+        android:layout_marginEnd="115dp"
+        android:layout_toStartOf="@+id/textView3"
+        android:src="@drawable/ic_action_menuhome1" />
+</RelativeLayout>

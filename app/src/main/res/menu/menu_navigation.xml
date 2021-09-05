@@ -4,15 +4,16 @@
         android:checkableBehavior="single"
         >
         <item
-            android:id="@+id/nav_down"
-            android:icon="@drawable/ic_action_download"
-            android:title="Download"
+            android:id="@+id/nav_home"
+            android:icon="@drawable/ic_action_home"
+            android:title="Home"
             android:checked="true"
             />
         <item
-            android:id="@+id/nav_drafts"
-            android:icon="@android:drawable/ic_menu_edit"
-            android:title="@string/nav_drafts"
+            android:id="@+id/nav_down"
+            android:icon="@drawable/ic_action_download"
+            android:title="Download"
+
             />
         <item
             android:id="@+id/nav_sent"

@@ -1,8 +1,8 @@
 package com.hfad.readapp2;
 
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -10,18 +10,16 @@ import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Environment;
-import android.text.Editable;
-import android.text.TextWatcher;
 import android.util.Log;
+import android.view.MenuItem;
 import android.view.View;
-import android.widget.AdapterView;
-import android.widget.EditText;
-import android.widget.ImageView;
-import android.widget.TextView;
+import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.GlideBuilder;
 import com.bumptech.glide.load.engine.cache.DiskLruCacheFactory;
+import com.google.android.material.bottomnavigation.BottomNavigationView;
+import com.hfad.readapp2.save.Truyen;
 
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -40,33 +38,102 @@ public class DocTruyenActivity extends AppCompatActivity {
     ArrayList<String> arrUrlAnh;
     RecyclerView recyclerView;
     DocTruyenAdapter docTruyenAdapter;
+    int onOroffline = 0;
+    String test = null;
+    int Pagecurrent;
+    Truyen truyen;
+    BottomNavigationView bottomNavigationView;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_doc_truyen);
 
-        //glidebuild("chap 1");
+
         init();
         anhXa();
+        configbottomnavigation();
         configRecyclerView();
         setUP();
         //setClick();
-        new DownloadTask2().execute(chapT.getLinkchap());
-
+        String c = String.valueOf(onOroffline);
+        Log.d("On hay off",c);
 
 
 
     }
+
+    private void configbottomnavigation() {
+        //bottomNavigationView.setOnNavigationItemSelectedListener(mOnNavigationItemSelectedListener);
+        recyclerView.setOnTouchListener(new TranslateAnimationUtil(this,bottomNavigationView));
+        bottomNavigationView.setOnNavigationItemSelectedListener(new BottomNavigationView.OnNavigationItemSelectedListener() {
+            @Override
+            public boolean onNavigationItemSelected(@NonNull MenuItem item) {
+                switch (item.getItemId()){
+                    case R.id.nav_left:
+                        Toast.makeText(DocTruyenActivity.this,"Left",Toast.LENGTH_SHORT).show();
+                        Intent intent1 = new Intent(DocTruyenActivity.this, DocTruyenActivity.class);
+                        Bundle bb = new Bundle();
+                        bb.putSerializable("chap",truyen);
+                        intent1.putExtra("data1",bb);
+                        if(Pagecurrent == truyen.getArraychap().size()-1){
+                            Toast.makeText(DocTruyenActivity.this,"Đây là chap đầu",Toast.LENGTH_SHORT).show();
+                            return true;
+                        }
+                        intent1.putExtra("indexchap",Pagecurrent+1);
+                        startActivity(intent1);
+
+                        break;
+                    case R.id.nav_backhome:
+                        Toast.makeText(DocTruyenActivity.this,"HOme",Toast.LENGTH_SHORT).show();
+                        Bundle d = new Bundle();
+                        d.putSerializable("truyenoffline",truyen);
+                        Intent intent2= new Intent(DocTruyenActivity.this, ChapActivity.class);
+                        intent2.putExtra("dataOff",d);
+                        startActivity(intent2);
+                        break;
+                    case R.id.nav_right:
+                        Toast.makeText(DocTruyenActivity.this,"Right",Toast.LENGTH_SHORT).show();
+                        Intent intent = new Intent(DocTruyenActivity.this, DocTruyenActivity.class);
+                        Bundle b = new Bundle();
+                        b.putSerializable("chap",truyen);
+                        intent.putExtra("data1",b);
+                        if(Pagecurrent == 0){
+                            Toast.makeText(DocTruyenActivity.this,"Đây là chap cuối",Toast.LENGTH_SHORT).show();
+                            return true;
+                        }
+                        intent.putExtra("indexchap",Pagecurrent-1);
+                        startActivity(intent);
+                        break;
+                }
+                return true;
+            }
+        });
+
+        // attaching bottom sheet behaviour - hide / show on scroll
+
+    }
+
     private void init(){
         arrUrlAnh = new ArrayList<>();
         Bundle b = getIntent().getBundleExtra("data1");
-        chapT = (Chap) b.getSerializable("chap");
-//        arrUrlAnh.add("https://cdn4.lhmanga.com/Store/Manga/2290e768-0de6-432d-842a-1ad5cf0e3039_610a0fb04c112.jpg");
-//        arrUrlAnh.add("https://cdn4.lhmanga.com/Store/Manga/8eeabefc-eb8d-4f34-a8b2-9436501ae149_610a0fb0572d8.jpg");
-//        arrUrlAnh.add("https://cdn4.lhmanga.com/Store/Manga/6e4b5b91-296e-4463-a096-c04e9766a1c3_610a0fb0632d3.jpg");
-//        //arrUrlAnh.add("http://cdn6.truyentranh8.net/hdd2/u2/cacom/32635/000-680802/005.jpg");
-//        //arrUrlAnh.add("http://cdn6.truyentranh8.net/hdd2/u2/cacom/32635/000-680802/006.jpg");
+        test = getIntent().getStringExtra("nameT");
+        if(test != null) {
+            glidebuild(getIntent().getStringExtra("nameT"));
+            //glidebuild("chap 2");
+            Log.d("testDocactivity",getIntent().getStringExtra("nameT"));
+        }
+        Pagecurrent = getIntent().getIntExtra("indexchap",0);
+        truyen = (Truyen) b.getSerializable("chap");
+        chapT = truyen.getArraychap().get(Pagecurrent);
 
+//        if(chapT.getListimage() != null){
+//            arrUrlAnh = chapT.getListimage();
+//            onOroffline = 1;
+//        }
+//        Log.d("DoctruyenAcitivty", String.valueOf(Pagecurrent));
+//        Log.d("DoctruyenAcitivty",chapT.getTenChap());
+        arrUrlAnh = chapT.getListimage();
+        onOroffline =1;
         docTruyenAdapter = new DocTruyenAdapter(arrUrlAnh,this);
     }
     private void configRecyclerView() {
@@ -80,6 +147,7 @@ public class DocTruyenActivity extends AppCompatActivity {
     }
 
     private void anhXa(){
+        bottomNavigationView = findViewById(R.id.bottom_nv);
         recyclerView = findViewById(R.id.revdoc);
 
     }
@@ -89,63 +157,8 @@ public class DocTruyenActivity extends AppCompatActivity {
     }
     private void setClick(){
     }
-//    public void right(View view){
-//        docTheoTrang(1);
-//
-//    }
-//    public void left(View view){
-//        docTheoTrang(-1);
-//
-//    }
-//    public void docTheoTrang(int i){
-//        soTrangdangDoc= soTrangdangDoc+i;
-//        if(soTrangdangDoc==0){
-//            soTrangdangDoc=1;
-//        }
-//        if(soTrangdangDoc>soTrang){
-//            soTrangdangDoc=soTrang;
-//        }
-//        txvSotrang.setText(soTrangdangDoc+" / "+soTrang);
-//        Glide.with(this).load(arrUrlAnh.get(soTrangdangDoc-1)).into(imgAnh);
-//    }
-    private class DownloadTask2 extends AsyncTask<String, Void, ArrayList<String>> {
 
-        private static final String TAG = "DownloadTask2";
 
-        @Override
-        protected ArrayList<String> doInBackground(String... strings) {
-            Document document = null;
-            //ArrayList<Manga> listArticle = new ArrayList<>();
-            try {
-                document = (Document) Jsoup.connect(strings[0]).get();
-                if (document != null) {
-                    Elements links = document.select("img");
-                    for (Element element : links) {
-                        Element linkchap = element.select("img[data-src]").first();
-                        //Parse to model
-                        if (linkchap != null) {
-                            String title = linkchap.attr("data-src");
-                            arrUrlAnh.add(title);
-                            Log.d("hianh", title);
-                        }
-
-                    }
-                }
-
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-            return arrUrlAnh;
-        }
-
-        @Override
-        protected void onPostExecute(ArrayList<String> articles) {
-            super.onPostExecute(articles);
-            //Setup data recyclerView
-            recyclerView.setAdapter(docTruyenAdapter);
-        }
-
-    }
     String sdRootPath = Environment.getExternalStorageDirectory().getPath();
     String appRootPath = null;
     private String getStorageDirectory(){

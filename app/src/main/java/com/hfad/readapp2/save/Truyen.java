@@ -8,12 +8,13 @@ import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import com.hfad.readapp2.Chap;
 
+import java.io.Serializable;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.List;
 
 @Entity(tableName = "truyen")
-public class Truyen {
+public class Truyen implements Serializable {
     @PrimaryKey(autoGenerate = true)
     private int id;
     private String namemanga;

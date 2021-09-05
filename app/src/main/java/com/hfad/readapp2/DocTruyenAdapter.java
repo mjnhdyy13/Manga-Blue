@@ -10,11 +10,14 @@ import android.widget.ImageView;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
+import androidx.swiperefreshlayout.widget.CircularProgressDrawable;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.GlideBuilder;
+import com.bumptech.glide.Priority;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.bumptech.glide.load.engine.cache.DiskLruCacheFactory;
+import com.bumptech.glide.request.RequestOptions;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -22,6 +25,15 @@ import java.util.List;
 public class DocTruyenAdapter extends RecyclerView.Adapter<DocTruyenAdapter.ViewHolder> {
     private ArrayList<String> manh;
     private Context mContext;
+    public RequestOptions options = new RequestOptions()
+            .centerCrop()
+            .placeholder(R.drawable.progress_animation)
+            .error(R.drawable.error)
+            .diskCacheStrategy(DiskCacheStrategy.ALL)
+            .priority(Priority.HIGH)
+            .dontAnimate()
+            .dontTransform();
+
 
     public DocTruyenAdapter(ArrayList<String> manh, Context mContext) {
         this.manh = manh;
@@ -32,6 +44,8 @@ public class DocTruyenAdapter extends RecyclerView.Adapter<DocTruyenAdapter.View
     @Override
     public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         View iteamview = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_doc,parent,false);
+
+
         return new ViewHolder(iteamview);
 
     }
@@ -40,9 +54,15 @@ public class DocTruyenAdapter extends RecyclerView.Adapter<DocTruyenAdapter.View
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
         String linkanh = manh.get(position);
 
-        Glide.with(this.mContext).load(linkanh).centerCrop()
-                .diskCacheStrategy(DiskCacheStrategy.ALL)
-                .
+
+        Glide.with(this.mContext).
+
+                load(linkanh).
+                //override(250,750).
+                //placeholder(R.drawable.loading).
+                apply(options).
+                diskCacheStrategy(DiskCacheStrategy.ALL).
+
                 into(holder.imageView);
 
 
